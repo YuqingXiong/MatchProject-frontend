@@ -25,6 +25,7 @@
     "paths": {
       "@/*": ["./src/*"]  // 这里需要配置
     },
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]
