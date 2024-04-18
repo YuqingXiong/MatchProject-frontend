@@ -2,13 +2,29 @@
 
 # 页面效果
 
+## 登录
+
+<img src="https://xiongyuqing-img.oss-cn-qingdao.aliyuncs.com/img/202404182001353.png" alt="image-20240418200105198" style="zoom:50%;" />
+
+## 首页
+
+<img src="https://xiongyuqing-img.oss-cn-qingdao.aliyuncs.com/img/202404182200351.png" alt="image-20240418220032212" style="zoom:50%;" />
+
 ## 搜索：
 
 <img src="https://xiongyuqing-img.oss-cn-qingdao.aliyuncs.com/img/202404090032326.png" alt="image-20240409003207160" style="zoom:50%;" />
 
+### 搜索结果：
+
+<img src="https://xiongyuqing-img.oss-cn-qingdao.aliyuncs.com/img/202404181959549.png" alt="image-20240418195927404" style="zoom:50%;" />
+
 ## 个人：
 
 <img src="https://xiongyuqing-img.oss-cn-qingdao.aliyuncs.com/img/202404090031014.png" alt="image-20240409003122841" style="zoom:50%;" />
+
+### 个人信息编辑
+
+<img src="https://xiongyuqing-img.oss-cn-qingdao.aliyuncs.com/img/202404182000875.png" alt="image-20240418200027719" style="zoom:50%;" />
 
 # 前端初始化
 
@@ -502,13 +518,88 @@ const onSubmit = (values) => {
 </style>
 ```
 
-效果：
-
-![image-20240409011455792](https://xiongyuqing-img.oss-cn-qingdao.aliyuncs.com/img/202404090114890.png)
-
 ## 搜索结果展示
 
+从路由中获取跳转到当前页面的携带的参数，从中获取搜索选择的 tags 列表
 
+```ts
+const route = useRoute();
+const {tags} = route.query;
+```
+
+添加一个钩子，在页面加载前向后端发起请求，查询包含这些 tags 的用户信息，并将查询到的信息赋值给 userList
+
+userList 绑定了页面显示
+
+```ts
+
+const userList = ref([]);
+
+onMounted(async ()=>{
+  const userListData = await myAxios.get('/user/search/tags', {
+    params: {
+      tagNameList: tags
+    },
+    paramsSerializer: params => {
+      return qs.stringify(params, {indices: false})
+    }
+  })
+      .then(function (response) {
+        console.log('/user/search/tags succeed', response);
+        return response?.data;
+      })
+      .catch(function (error) {
+        console.error('/user/search/tags error', error);
+        Toast.fail('请求失败');
+      })
+  console.log(userListData);
+  if(userListData){
+    userListData.forEach(user => {
+      if (user.tags) {
+        user.tags = JSON.parse(user.tags);
+      }
+    })
+    userList.value = userListData;
+  }
+})
+```
+
+> 这里使用了 qs 来传递列表字符串
+
+## 首页展示
+
+发送请求，展示用户：
+
+```ts
+userListData = await myAxios.get('/user/recommend', {
+      params: {
+        pageSize: 8,
+        pageNum: 1,
+      },
+    })
+    .then(function (response) {
+      console.log('/user/recommend succeed', response);
+      return response?.data?.records;
+    })
+    .catch(function (error) {
+      console.error('/user/recommend error', error);
+      showFailToast('请求失败');
+    })
+```
+
+获取到用户后，对 tags 进行json解析为列表，赋值给页面绑定的变量：
+
+```ts
+if (userListData) {
+    userListData.forEach((user: UserType) => {
+      if (user.tags) {
+        user.tags = JSON.parse(user.tags);
+      }
+    })
+    console.log("userList.value", userListData);
+    userList.value = userListData;
+  }
+```
 
 # Bug Record
 

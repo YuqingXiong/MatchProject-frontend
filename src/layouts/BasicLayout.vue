@@ -10,8 +10,9 @@
       <van-icon name="search" size="18" />
     </template>
   </van-nav-bar>
-
-  <router-view/>
+  <div id="content">
+    <router-view/>
+  </div>
   <van-tabbar route @change="onChange">
     <van-tabbar-item to="/" icon="home-o" name="index">主页</van-tabbar-item>
     <van-tabbar-item to="/team" icon="search" name="team">队伍</van-tabbar-item>
@@ -35,5 +36,7 @@ const onClickRight = () => {
 </script>
 
 <style scoped>
-
+#content{
+  padding-bottom: 50px;
+}
 </style>
